@@ -1,2 +1,4 @@
 *.pyc
 
+/requirements.txt
+/settings.py
