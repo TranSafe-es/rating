@@ -26,19 +26,17 @@ class UsersRating(Base):
         """Return object data in easily serializeable format"""
         return {
             'uid': self.uid,
-            'name': self.name,
-            'email': self.email,
-            'picture_url': self.picture_url,
-            'platform': self.platform,
+            'rating_total': self.rating_total,
+            'rating_given': self.rating_given,
+            'rating_received': self.rating_received,
         }
-
 
 class Ratings(Base):
     __tablename__ = 'ratings'
 
     uid = Column(String, primary_key=True)
-    user_id_source = ('UsersRating', ForeignKey('users_rating.uid'))
-    user_id_destination = Column(Float, default=0)
+    user_id_source = Column(String, ForeignKey('users_rating.uid'))
+    user_id_destination = Column(String, ForeignKey('users_rating.uid'))
     rating = Column(Integer)
     message = Column(String)
 
@@ -48,3 +46,14 @@ class Ratings(Base):
         self.user_id_destination = user_id_destination
         self.rating = rating
         self.message = message
+
+    @property
+    def serialize(self):
+        """Return object data in easily serializeable format"""
+        return {
+            'uid': self.uid,
+            'user_id_source': self.user_id_source,
+            'user_id_destination': self.user_id_destination,
+            'rating': self.rating,
+            'message': self.message,
+        }
