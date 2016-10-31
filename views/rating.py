@@ -77,7 +77,7 @@ def create():
         user = UsersRating.query.filter_by(uid=source_id).first()
         rating_given = (rating * 100) / 5
         user.rating_given = ((user.rating_given * user.rating_given_count) + rating_given) / \
-                               (user.rating_given_count + 1)
+                            (user.rating_given_count + 1)
 
         user.rating_total = (((user.rating_given * user.rating_given_count) + rating_given) +
                              (user.rating_received * user.rating_received_count)) / \
