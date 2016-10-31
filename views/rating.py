@@ -23,7 +23,7 @@ logging.getLogger().setLevel(logging.DEBUG)
 log = logging.getLogger()
 
 
-@rating.route("/", methods = ['POST'])
+@rating.route("/", methods=['POST'])
 def create():
     if request.form["dest_id"] is None or request.form["source_id"] is None or request.form["rating"] is None:
         return build_error_response("Invalid Parameters", 400,
@@ -35,7 +35,7 @@ def create():
 
     dest_id = request.form["dest_id"]
     source_id = request.form["source_id"]
-    rating = request.form["rating"]
+    rate = request.form["rating"]
     rate_id = uuid.uuid4()
 
     if request.form["message"] is not None:
@@ -47,7 +47,7 @@ def create():
 
     db_session.add(rate)
     if UsersRating.query.filter_by(uid=dest_id).count() < 1:
-        rating_received = (rating*100)/5
+        rating_received = (rate*100)/5
         rating_received_count = 1
         user_dest = UsersRating(uid=dest_id, rating_received=rating_received,
                                 rating_received_count=rating_received_count, rating_total=rating_received)
@@ -55,7 +55,7 @@ def create():
         db_session.commit()
     else:
         user = UsersRating.query.filter_by(uid=dest_id).first()
-        rating_received = (rating * 100)/5
+        rating_received = (rate * 100)/5
         user.rating_received = ((user.rating_received*user.rating_received_count) + rating_received) / \
                                (user.rating_received_count + 1)
 
@@ -67,7 +67,7 @@ def create():
         db_session.commit()
 
     if UsersRating.query.filter_by(uid=source_id).count() < 1:
-        rating_given = (rating * 100) / 5
+        rating_given = (rate * 100) / 5
         rating_given_count = 1
         user_source = UsersRating(uid=dest_id, rating_given=rating_given,
                                   rating_given_count=rating_given_count, rating_total=rating_received)
@@ -75,7 +75,7 @@ def create():
         db_session.commit()
     else:
         user = UsersRating.query.filter_by(uid=source_id).first()
-        rating_given = (rating * 100) / 5
+        rating_given = (rate * 100) / 5
         user.rating_given = ((user.rating_given * user.rating_given_count) + rating_given) / \
                             (user.rating_given_count + 1)
 
