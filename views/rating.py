@@ -3,7 +3,7 @@ import sys
 import os
 import datetime
 import json
-import base64
+import uuid
 import urllib
 from rauth import *
 from flask_restful import Api, Resource
@@ -13,20 +13,83 @@ sys.path.insert(1, os.path.join(sys.path[0], '..'))
 
 from settings import *
 from db import db_session
-from models import Users
+from models import UsersRating, Ratings
 
-authorization = Blueprint('authorization', __name__)
+rating = Blueprint('rating', __name__)
 
 import logging
 logging.basicConfig(stream=sys.stderr)
 logging.getLogger().setLevel(logging.DEBUG)
 log = logging.getLogger()
 
-@authorization.route("/", methods = ['GET'])
-def home():
-    return render_template('home.html')
 
-@authorization.route("/validate", methods = ['POST'])
+@rating.route("/", methods = ['POST'])
+def create():
+    if request.form["dest_id"] is None or request.form["source_id"] is None or request.form["rating"] is None:
+        return build_error_response("Invalid Parameters", 400,
+                                    "Destination ID, Source ID or Rating not present in the request")
+
+    if request.form["rating"] < 1 or request.form["rating"] > 5:
+        return build_error_response("Invalid Rating Values", 400,
+                                    "Rating value should be between 1 and 5")
+
+    dest_id = request.form["dest_id"]
+    source_id = request.form["source_id"]
+    rating = request.form["rating"]
+    rate_id = uuid.uuid4()
+
+    if request.form["message"] is not None:
+        message = request.form["message"]
+        rate = Ratings(uid=rate_id, user_id_source=source_id, user_id_destination=dest_id, rating=rating,
+                       message=message)
+    else:
+        rate = Ratings(uid=rate_id, user_id_source=source_id, user_id_destination=dest_id, rating=rating)
+
+    db_session.add(rate)
+    if UsersRating.query.filter_by(uid=dest_id).count() < 1:
+        rating_received = (rating*100)/5
+        rating_received_count = 1
+        user_dest = UsersRating(uid=dest_id, rating_received=rating_received,
+                                rating_received_count=rating_received_count, rating_total=rating_received)
+        db_session.add(user_dest)
+        db_session.commit()
+    else:
+        user = UsersRating.query.filter_by(uid=dest_id).first()
+        rating_received = (rating * 100)/5
+        user.rating_received = ((user.rating_received*user.rating_received_count) + rating_received) / \
+                               (user.rating_received_count + 1)
+
+        user.rating_total = (((user.rating_received*user.rating_received_count) + rating_received) +
+                             (user.rating_given*user.rating_given_count)) / \
+                            (user.rating_given_count + user.rating_received_count + 1)
+
+        user.rating_received_count += 1
+        db_session.commit()
+
+    if UsersRating.query.filter_by(uid=source_id).count() < 1:
+        rating_given = (rating * 100) / 5
+        rating_given_count = 1
+        user_source = UsersRating(uid=dest_id, rating_given=rating_given,
+                                  rating_given_count=rating_given_count, rating_total=rating_received)
+        db_session.add(user_source)
+        db_session.commit()
+    else:
+        user = UsersRating.query.filter_by(uid=source_id).first()
+        rating_given = (rating * 100) / 5
+        user.rating_given = ((user.rating_given * user.rating_given_count) + rating_given) / \
+                               (user.rating_given_count + 1)
+
+        user.rating_total = (((user.rating_given * user.rating_given_count) + rating_given) +
+                             (user.rating_received * user.rating_received_count)) / \
+                            (user.rating_given_count + user.rating_received_count + 1)
+
+        user.rating_given_count += 1
+        db_session.commit()
+
+    return build_response("Rate Done", 200, "Rate has been done successfully")
+
+
+@rating.route("/rate", methods = ['POST'])
 def validate():
     if 'Access-Token' not in request.headers:
         return build_error_response("Missing authentication", \

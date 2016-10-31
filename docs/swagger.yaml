@@ -12,7 +12,7 @@ schemes:
   - http
 # will be prefixed to all paths
 paths:
-  /rate:
+  /rating:
     post:
       summary: Rate User
       description: |
