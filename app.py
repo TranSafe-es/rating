@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 app.secret_key = SECRET_KEY
 
-app.register_blueprint(rating, url_prefix='api/v1/rating')
+app.register_blueprint(rating, url_prefix='/api/v1/rating')
 
 if __name__ == '__main__':
     app.run(port=PORT, host=ALLOWED_HOSTS)

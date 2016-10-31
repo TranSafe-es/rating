@@ -89,51 +89,34 @@ def create():
     return build_response("Rate Done", 200, "Rate has been done successfully")
 
 
-@rating.route("/rate", methods = ['POST'])
-def validate():
-    if 'Access-Token' not in request.headers:
-        return build_error_response("Missing authentication", \
-                                    400,\
-                                    "Access-Token header not present in the request")
-    access_token = request.headers.get('Access-Token')
-    user = Users.query.filter_by(access_token=access_token).first()
-    if user == None:
-        return build_error_response("Invalid authentication", \
-                                    401,\
-                                    "Access-Token is invalid for this service")
-    if not valid_token(user):
-        return build_error_response("Invalid authentication", \
-                                    401,\
-                                    "Access-Token is no longer valid, user logged out or token expired")
-    user.creation_date = datetime.datetime.now()
-    db_session.commit()
-    return build_response("", \
-                        200,\
-                        "Request provided is valid")
+@rating.route("/rating/<uid>", methods = ['GET'])
+def get_rating(uid):
+    rating_type = "received"
+    size = 5
+    fields = ["rating"]
+    if "rating" in request.args:
+        if request.args.get("rating") not in ["received", "given", "all"]:
+            return build_error_response("Invalid rating parameter", 400,
+                                        "Rating argument should be received, given or all")
+        rating_type = request.args.get("rating")
 
-@authorization.route("/logout", methods = ['GET'])
-def logout():
-    if 'redirect_url' in request.args:
-        referrer = request.args.get('redirect_url')
-    else:
-        referrer = request.referrer
-    if 'Access-Token' not in request.headers and 'access_token' not in request.args:
-        return build_html_error_response("Missing authentication", \
-                                    400,\
-                                    "Access-Token header not present in the request")
-    if 'Access-Token' not in request.headers:
-        access_token = request.args.get('access_token')
-    else:
-        access_token = request.headers.get('Access-Token')
-    user = Users.query.filter_by(access_token=access_token).first()
-    if user == None:
-        return build_html_error_response("Invalid authentication", \
-                                    401,\
-                                    "Access-Token is invalid for this service")
-    user.token_valid = False
-    db_session.commit()
+    if "size" in request.args:
+        if not request.args.get("size").isdigit() or request.args.get("size") != "all":
+            return build_error_response("Invalid size parameter", 400,
+                                        "Size argument should be a number or all")
+        size = int(request.args.get("size"))
 
-    return render_template("logout.html", referrer=referrer.split('?')[0], email=user.email)
+    if "fields" in request.args:
+        fields_requested = request.args.get("fields").split(",")
+        if [x in fields_available for x in fields_requested]:
+            return build_error_response("Invalid fields parameter", 400,
+                                        "Fields argument contains an invalid field")
+        fields = fields_requested
+
+    data = UsersRatings.query.filter_by(uid=uid).first().serialize(fields=fields, size=size, rating_type=rating_type)
+
+    return build_response(data, 200, "Rating successfully retrieved.")
+
 
 def build_response(data, status, desc):
     jd = {"status_code:" : status, "error": "", "description": desc, "data": data}
