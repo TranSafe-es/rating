@@ -12,4 +12,6 @@ EXPOSE 5001
 
 RUN ["python", "migrate.py"]
 
+RUN ["python", "tests/tests.py"]
+
 CMD ["python", "app.py"]

@@ -17,7 +17,7 @@ class UsersRating(Base):
     rating_received = Column(Float, default=0)
     rating_received_count = Column(Integer, default=0)
 
-    def __init__(self, uid, rating_total, rating_given, rating_given_count, rating_received, rating_received_count):
+    def __init__(self, uid, rating_total=0, rating_given=0, rating_given_count=0, rating_received=0, rating_received_count=0):
         self.uid = uid
         self.rating_total = rating_total
         self.rating_given = rating_given
@@ -66,16 +66,15 @@ class Ratings(Base):
     user_id_source = Column(String, ForeignKey('users_rating.uid'))
     user_id_destination = Column(String, ForeignKey('users_rating.uid'))
     rating = Column(Integer)
-    message = Column(String, default="Without Message")
+    message = Column(String)
     creation_date = Column(DateTime, default=datetime.datetime.now())
 
-    def __init__(self, uid, user_id_source, user_id_destination, rating, message, creation_date):
+    def __init__(self, uid, user_id_source, user_id_destination, rating, message="Without Message"):
         self.uid = uid
         self.user_id_source = user_id_source
         self.user_id_destination = user_id_destination
         self.rating = rating
         self.message = message
-        self.creation_date = creation_date
 
     def serialize(self, fields=['rating']):
         """Return object data in easily serializeable format"""

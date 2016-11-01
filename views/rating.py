@@ -29,25 +29,18 @@ def create():
         return build_error_response("Invalid Parameters", 400,
                                     "Destination ID, Source ID or Rating not present in the request")
 
-    if request.form["rating"] < 1 or request.form["rating"] > 5:
+    print request.form["rating"]
+    if int(request.form["rating"]) < 1 or int(request.form["rating"]) > 5:
         return build_error_response("Invalid Rating Values", 400,
                                     "Rating value should be between 1 and 5")
 
     dest_id = request.form["dest_id"]
     source_id = request.form["source_id"]
-    rate = request.form["rating"]
+    rate_value = int(request.form["rating"])
     rate_id = uuid.uuid4()
 
-    if request.form["message"] is not None:
-        message = request.form["message"]
-        rate = Ratings(uid=rate_id, user_id_source=source_id, user_id_destination=dest_id, rating=rating,
-                       message=message)
-    else:
-        rate = Ratings(uid=rate_id, user_id_source=source_id, user_id_destination=dest_id, rating=rating)
-
-    db_session.add(rate)
     if UsersRating.query.filter_by(uid=dest_id).count() < 1:
-        rating_received = (rate*100)/5
+        rating_received = (rate_value*100)/5
         rating_received_count = 1
         user_dest = UsersRating(uid=dest_id, rating_received=rating_received,
                                 rating_received_count=rating_received_count, rating_total=rating_received)
@@ -55,7 +48,7 @@ def create():
         db_session.commit()
     else:
         user = UsersRating.query.filter_by(uid=dest_id).first()
-        rating_received = (rate * 100)/5
+        rating_received = (rate_value * 100)/5
         user.rating_received = ((user.rating_received*user.rating_received_count) + rating_received) / \
                                (user.rating_received_count + 1)
 
@@ -67,15 +60,15 @@ def create():
         db_session.commit()
 
     if UsersRating.query.filter_by(uid=source_id).count() < 1:
-        rating_given = (rate * 100) / 5
+        rating_given = (rate_value * 100) / 5
         rating_given_count = 1
-        user_source = UsersRating(uid=dest_id, rating_given=rating_given,
+        user_source = UsersRating(uid=source_id, rating_given=rating_given,
                                   rating_given_count=rating_given_count, rating_total=rating_received)
         db_session.add(user_source)
         db_session.commit()
     else:
         user = UsersRating.query.filter_by(uid=source_id).first()
-        rating_given = (rate * 100) / 5
+        rating_given = (rate_value * 100) / 5
         user.rating_given = ((user.rating_given * user.rating_given_count) + rating_given) / \
                             (user.rating_given_count + 1)
 
@@ -85,6 +78,16 @@ def create():
 
         user.rating_given_count += 1
         db_session.commit()
+
+    if request.form["message"] is not None:
+        message = request.form["message"]
+        rate = Ratings(uid=rate_id, user_id_source=source_id, user_id_destination=dest_id, rating=rate_value,
+                       message=message)
+    else:
+        rate = Ratings(uid=rate_id, user_id_source=source_id, user_id_destination=dest_id, rating=rate_value)
+
+    db_session.add(rate)
+    db_session.commit()
 
     return build_response("Rate Done", 200, "Rate has been done successfully")
 
@@ -123,10 +126,12 @@ def build_response(data, status, desc):
     resp = Response(response=json.dumps(jd), status=status, mimetype="application/json")
     return resp
 
+
 def build_error_response(error_title, status, error_desc):
     jd = {"status_code:" : status, "error": error_title, "description": error_desc, "data": ""}
     resp = Response(response=json.dumps(jd), status=status, mimetype="application/json")
     return resp
+
 
 def build_html_error_response(error_title, status, error_desc):
     jd = {"status_code:" : status, "error": error_title, "description": error_desc, "data": ""}
