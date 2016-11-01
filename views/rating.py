@@ -92,7 +92,7 @@ def create():
     return build_response("Rate Done", 200, "Rate has been done successfully")
 
 
-@rating.route("/rating/<uid>", methods = ['GET'])
+@rating.route("/<uid>/", methods=['GET'])
 def get_rating(uid):
     rating_type = "received"
     size = 5
@@ -116,25 +116,25 @@ def get_rating(uid):
                                         "Fields argument contains an invalid field")
         fields = fields_requested
 
-    data = UsersRatings.query.filter_by(uid=uid).first().serialize(fields=fields, size=size, rating_type=rating_type)
+    data = UsersRating.query.filter_by(uid=uid).first().serialize(fields=fields, size=size, rating_type=rating_type)
 
     return build_response(data, 200, "Rating successfully retrieved.")
 
 
 def build_response(data, status, desc):
-    jd = {"status_code:" : status, "error": "", "description": desc, "data": data}
+    jd = {"status_code:": status, "error": "", "description": desc, "data": data}
     resp = Response(response=json.dumps(jd), status=status, mimetype="application/json")
     return resp
 
 
 def build_error_response(error_title, status, error_desc):
-    jd = {"status_code:" : status, "error": error_title, "description": error_desc, "data": ""}
+    jd = {"status_code:": status, "error": error_title, "description": error_desc, "data": ""}
     resp = Response(response=json.dumps(jd), status=status, mimetype="application/json")
     return resp
 
 
 def build_html_error_response(error_title, status, error_desc):
-    jd = {"status_code:" : status, "error": error_title, "description": error_desc, "data": ""}
+    jd = {"status_code:": status, "error": error_title, "description": error_desc, "data": ""}
     resp = render_template("error.html", code=status, error_title=error_title, error_message=error_desc)
     return resp
 ################################################

@@ -35,7 +35,7 @@ class UsersRating(Base):
                 'rating_given_count': self.rating_given_count,
                 'rating_received': self.rating_received,
                 'rating_received_count': self.rating_received_count,
-                'ratings': [r.serialize(fields) for r in Ratings.query.filter_by(user_id_destination=uid).order_by(Ratings.creation_date).limit(size).all()]
+                'ratings': [r.serialize(fields) for r in Ratings.query.filter_by(user_id_destination=self.uid).order_by(Ratings.creation_date).limit(size).all()]
             }
         elif rating_type == "given":
             return {
@@ -45,7 +45,7 @@ class UsersRating(Base):
                 'rating_given_count': self.rating_given_count,
                 'rating_received': self.rating_received,
                 'rating_received_count': self.rating_received_count,
-                'ratings': [r.serialize(fields) for r in Ratings.query.filter_by(user_id_source=uid).order_by(Ratings.creation_date).limit(size).all()]
+                'ratings': [r.serialize(fields) for r in Ratings.query.filter_by(user_id_source=self.uid).order_by(Ratings.creation_date).limit(size).all()]
             }
         else:
             return {

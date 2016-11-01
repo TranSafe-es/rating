@@ -38,6 +38,19 @@ class TestCase(unittest.TestCase):
                                                              message="hello"))
         self.assertEqual(response.status_code, 400)
 
+        response = self.app.get("/api/v1/rating/ola/")
+
+        print response.data
+        '''
+        resp_json = json.loads(response.data)
+
+        service_uuid = resp_json["service_uuid"]
+        expiringDate = resp_json["expiringDate"]
+        desc = resp_json["description"]
+
+        self.assertEqual(expiringDate, "03-07-2020 13:46")
+        self.assertEqual(desc, "Test")
+        '''
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stderr)
     logging.getLogger().setLevel(logging.DEBUG)
