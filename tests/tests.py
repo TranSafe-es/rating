@@ -38,7 +38,7 @@ class TestCase(unittest.TestCase):
                                                              message="hello"))
         self.assertEqual(response.status_code, 400)
 
-        response = self.app.get("/api/v1/rating/ola/")
+        response = self.app.get("/api/v1/rating/ola/?fields=rating,message,creation_date&size=10&rating=all")
 
         print response.data
         '''
@@ -55,4 +55,3 @@ if __name__ == '__main__':
     logging.basicConfig(stream=sys.stderr)
     logging.getLogger().setLevel(logging.DEBUG)
     unittest.main(testRunner=xmlrunner.XMLTestRunner(output='test-reports'))
-

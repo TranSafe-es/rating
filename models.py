@@ -27,36 +27,68 @@ class UsersRating(Base):
 
     def serialize(self, fields=None, size=5, rating_type="received"):
         """Return object data in easily serializeable format"""
-        if rating_type == "received":
-            return {
-                'uid': self.uid,
-                'rating_total': self.rating_total,
-                'rating_given': self.rating_given,
-                'rating_given_count': self.rating_given_count,
-                'rating_received': self.rating_received,
-                'rating_received_count': self.rating_received_count,
-                'ratings': [r.serialize(fields) for r in Ratings.query.filter_by(user_id_destination=self.uid).order_by(Ratings.creation_date).limit(size).all()]
-            }
-        elif rating_type == "given":
-            return {
-                'uid': self.uid,
-                'rating_total': self.rating_total,
-                'rating_given': self.rating_given,
-                'rating_given_count': self.rating_given_count,
-                'rating_received': self.rating_received,
-                'rating_received_count': self.rating_received_count,
-                'ratings': [r.serialize(fields) for r in Ratings.query.filter_by(user_id_source=self.uid).order_by(Ratings.creation_date).limit(size).all()]
-            }
+        if size == "all":
+            if rating_type == "received":
+                return {
+                    'uid': self.uid,
+                    'rating_total': self.rating_total,
+                    'rating_given': self.rating_given,
+                    'rating_given_count': self.rating_given_count,
+                    'rating_received': self.rating_received,
+                    'rating_received_count': self.rating_received_count,
+                    'ratings': [r.serialize(fields) for r in Ratings.query.filter_by(user_id_destination=self.uid).order_by(Ratings.creation_date).all()]
+                }
+            elif rating_type == "given":
+                return {
+                    'uid': self.uid,
+                    'rating_total': self.rating_total,
+                    'rating_given': self.rating_given,
+                    'rating_given_count': self.rating_given_count,
+                    'rating_received': self.rating_received,
+                    'rating_received_count': self.rating_received_count,
+                    'ratings': [r.serialize(fields) for r in Ratings.query.filter_by(user_id_source=self.uid).order_by(Ratings.creation_date).all()]
+                }
+            else:
+                return {
+                    'uid': self.uid,
+                    'rating_total': self.rating_total,
+                    'rating_given': self.rating_given,
+                    'rating_given_count': self.rating_given_count,
+                    'rating_received': self.rating_received,
+                    'rating_received_count': self.rating_received_count,
+                    'ratings': [r.serialize(fields) for r in Ratings.query.order_by(Ratings.creation_date).all()]
+                }
         else:
-            return {
-                'uid': self.uid,
-                'rating_total': self.rating_total,
-                'rating_given': self.rating_given,
-                'rating_given_count': self.rating_given_count,
-                'rating_received': self.rating_received,
-                'rating_received_count': self.rating_received_count,
-                'ratings': [r.serialize(fields) for r in Ratings.query.order_by(Ratings.creation_date).limit(size).all()]
-            }
+            if rating_type == "received":
+                return {
+                    'uid': self.uid,
+                    'rating_total': self.rating_total,
+                    'rating_given': self.rating_given,
+                    'rating_given_count': self.rating_given_count,
+                    'rating_received': self.rating_received,
+                    'rating_received_count': self.rating_received_count,
+                    'ratings': [r.serialize(fields) for r in Ratings.query.filter_by(user_id_destination=self.uid).order_by(Ratings.creation_date).limit(size).all()]
+                }
+            elif rating_type == "given":
+                return {
+                    'uid': self.uid,
+                    'rating_total': self.rating_total,
+                    'rating_given': self.rating_given,
+                    'rating_given_count': self.rating_given_count,
+                    'rating_received': self.rating_received,
+                    'rating_received_count': self.rating_received_count,
+                    'ratings': [r.serialize(fields) for r in Ratings.query.filter_by(user_id_source=self.uid).order_by(Ratings.creation_date).limit(size).all()]
+                }
+            else:
+                return {
+                    'uid': self.uid,
+                    'rating_total': self.rating_total,
+                    'rating_given': self.rating_given,
+                    'rating_given_count': self.rating_given_count,
+                    'rating_received': self.rating_received,
+                    'rating_received_count': self.rating_received_count,
+                    'ratings': [r.serialize(fields) for r in Ratings.query.order_by(Ratings.creation_date).limit(size).all()]
+                }
 
 
 class Ratings(Base):
@@ -84,6 +116,6 @@ class Ratings(Base):
             'user_id_destination': self.user_id_destination,
             'rating': self.rating,
             'message': self.message,
-            'creation_date': self.creation_date
+            'creation_date': self.creation_date.strftime('%d-%m-%Y %H:%M')
         }
-        return {key: value for (key, value) in data if key in fields}
+        return {key: value for (key, value) in data.iteritems() if key in fields}

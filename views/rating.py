@@ -94,6 +94,7 @@ def create():
 
 @rating.route("/<uid>/", methods=['GET'])
 def get_rating(uid):
+    fields_available = ["uid", "user_id_source", "user_id_destination", "rating", "message", "creation_date"]
     rating_type = "received"
     size = 5
     fields = ["rating"]
@@ -104,14 +105,18 @@ def get_rating(uid):
         rating_type = request.args.get("rating")
 
     if "size" in request.args:
-        if not request.args.get("size").isdigit() or request.args.get("size") != "all":
+        print request.args.get("size")
+        if not request.args.get("size").isdigit() and request.args.get("size") != "all":
             return build_error_response("Invalid size parameter", 400,
                                         "Size argument should be a number or all")
-        size = int(request.args.get("size"))
+        try:
+            size = int(request.args.get("size"))
+        except:
+            size = request.args.get("size")
 
     if "fields" in request.args:
         fields_requested = request.args.get("fields").split(",")
-        if [x in fields_available for x in fields_requested]:
+        if False if [x in fields_available for x in fields_requested] else True:
             return build_error_response("Invalid fields parameter", 400,
                                         "Fields argument contains an invalid field")
         fields = fields_requested
