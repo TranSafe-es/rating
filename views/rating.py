@@ -121,8 +121,9 @@ def get_rating(uid):
                                         "Fields argument contains an invalid field")
         fields = fields_requested
 
-    data = UsersRating.query.filter_by(uid=uid).first().serialize(fields=fields, size=size, rating_type=rating_type)
-    if not data:
+    try:
+        data = UsersRating.query.filter_by(uid=uid).first().serialize(fields=fields, size=size, rating_type=rating_type)
+    except:        
         user_dest = UsersRating(uid=uid)
         db_session.add(user_dest)
         db_session.commit()
