@@ -123,10 +123,13 @@ def get_rating(uid):
 
     try:
         data = UsersRating.query.filter_by(uid=uid).first().serialize(fields=fields, size=size, rating_type=rating_type)
-    except:        
+    except:
         user_dest = UsersRating(uid=uid)
         db_session.add(user_dest)
-        db_session.commit()
+        try:
+            db_session.commit()
+        except:
+            db_session.rollback()
         data = UsersRating.query.filter_by(uid=uid).first().serialize(fields=fields, size=size, rating_type=rating_type)
     return build_response(data, 200, "Rating successfully retrieved.")
 
