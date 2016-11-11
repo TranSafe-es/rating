@@ -122,7 +122,10 @@ def get_rating(uid):
         fields = fields_requested
 
     data = UsersRating.query.filter_by(uid=uid).first().serialize(fields=fields, size=size, rating_type=rating_type)
-
+    if not data:
+        user_dest = UsersRating(uid=uid)
+        db_session.add(user_dest)
+        db_session.commit()
     return build_response(data, 200, "Rating successfully retrieved.")
 
 
