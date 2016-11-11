@@ -126,6 +126,7 @@ def get_rating(uid):
         user_dest = UsersRating(uid=uid)
         db_session.add(user_dest)
         db_session.commit()
+        data = UsersRating.query.filter_by(uid=uid).first().serialize(fields=fields, size=size, rating_type=rating_type)
     return build_response(data, 200, "Rating successfully retrieved.")
 
 
