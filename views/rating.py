@@ -29,7 +29,6 @@ def create():
         return build_error_response("Invalid Parameters", 400,
                                     "Destination ID, Source ID or Rating not present in the request")
 
-    print request.form["rating"]
     if int(request.form["rating"]) < 1 or int(request.form["rating"]) > 5:
         return build_error_response("Invalid Rating Values", 400,
                                     "Rating value should be between 1 and 5")
