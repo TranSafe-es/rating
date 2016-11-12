@@ -27,15 +27,15 @@ class TestCase(unittest.TestCase):
     def test_add_rating(self):
 
         response = self.app.post("/api/v1/rating/", data=dict(dest_id="ola", source_id="ola1", rating="2",
-                                                              message="hello"))
+                                                              message="hello", transaction_id="aaa"))
         print response.data
         self.assertEqual(response.status_code, 200)
 
-        response = self.app.post("/api/v1/rating/", data=dict(source_id="ola1", rating=2, message="hello"))
+        response = self.app.post("/api/v1/rating/", data=dict(source_id="ola1", rating=2, message="hello", transaction_id="aaa"))
         self.assertEqual(response.status_code, 400)
 
         response = self.app.post("/api/v1/rating/", data=dict(dest_id="ola", source_id="ola1", rating="10",
-                                                             message="hello"))
+                                                             message="hello", transaction_id="aaa"))
         self.assertEqual(response.status_code, 400)
 
         response = self.app.get("/api/v1/rating/ola/?fields=rating,message,creation_date&size=10&rating=all")
