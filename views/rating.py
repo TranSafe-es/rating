@@ -25,7 +25,7 @@ log = logging.getLogger()
 
 @rating.route("/", methods=['POST'])
 def create():
-    if request.form["dest_id"] is None or request.form["source_id"] is None or request.form["rating"] is None or request.form["transaction_id"]:
+    if request.form["dest_id"] is None or request.form["source_id"] is None or request.form["rating"] is None or request.form["transaction_id"] is None:
         return build_error_response("Invalid Parameters", 400,
                                     "Destination ID, Source ID, Rating or Transaction ID not present in the request")
 
