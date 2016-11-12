@@ -81,7 +81,7 @@ def create():
 
     if request.form["message"] is not None:
         message = request.form["message"]
-        rate = Ratings(uid=rate_id, user_id_source=source_id, user_id_destination=dest_id, rating=rate_value, transaction_id=transaction_id
+        rate = Ratings(uid=rate_id, user_id_source=source_id, user_id_destination=dest_id, rating=rate_value, transaction_id=transaction_id,
                        message=message)
     else:
         rate = Ratings(uid=rate_id, user_id_source=source_id, user_id_destination=dest_id, rating=rate_value, transaction_id=transaction_id)
