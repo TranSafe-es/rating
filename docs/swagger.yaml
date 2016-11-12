@@ -11,12 +11,14 @@ host: transafe.rafaelferreira.pt
 schemes:
   - http
 # will be prefixed to all paths
+basePath: /api/v1
+
 paths:
-  /rating:
+  /rate:
     post:
       summary: Rate User
       description: |
-        Method used to rate a user
+        Method used to rate a transaction associated to a given user.
       parameters:
         - name: dest_id
           description: Id of the rating target
@@ -25,6 +27,11 @@ paths:
           in: formData
         - name: source_id
           description: Id of the rating provider
+          required: true
+          type: string
+          in: formData
+        - name: transaction_id
+          description: ID of the transaction that rating belogs to
           required: true
           type: string
           in: formData
@@ -46,9 +53,9 @@ paths:
           
   /rating/{id}:
     get:
-      summary: Rate User
+      summary: Get User Rating.
       description: |
-        Method used to retrieve ratings
+        Method used to retrieve ratings for a given user.
       produces:
         - application/json
       parameters:
@@ -81,23 +88,93 @@ paths:
         400:
           description: Invalid parameters.
       
+  /rating/transaction/{transaction_id}:
+    get:
+      summary: Get Transaction Rating.
+      description: |
+        Method used to retrieve rating for a given transaction.
+      produces:
+        - application/json
+      parameters:
+        - name: transaction_id
+          description: Id of the rating target
+          required: true
+          type: string
+          in: path
+        - name: rating
+          description: Choice if user wants rating given, received or all. Default is received only.
+          required: false
+          type: string
+          in: query
+        - name: size
+          description: How many results the user wants to receive or all. Only aplicable if results are more than the number specified. Default is latest 5 ratings. Number provided is always counting from latests.
+          required: false
+          type: string
+          in: query
+        - name: fields
+          description: The fields the user wants to retrieve. Options are rating, source_id, dest_id, message. Default only rating is given
+          required: false
+          type: string
+          in: query
+
+      responses:
+        200:
+          description: Json data requested by the user
+          schema: 
+            $ref: "#/definitions/UserRating"
+        400:
+          description: Invalid parameters.
 
 definitions:
   Rating:
     properties:
+      uid:
+        type: string
+        description: Unique identifier.
       rating:
         type: number
-        description: Rating number between 1-5.
-      source_id:
+        description: Rating number.
+      user_id_source:
         type: string
         description: ID of the user that gave rated.
-      dest_id:
+      user_id_destination:
         type: string
         description: ID of the user that was rated.
       message:
         type: string
         description: Optional message provided by source_id about the rate.
-      
+      transaction_id:
+        type: string
+        description: Transaction ID the rating referers to.
+      creation_date:
+        type: string
+        description: Creation date of the rating.
+        
+        
+  UserRating:
+    properties:
+      uid:
+        type: string
+        description: User uid.
+      rating_total:
+        type: number
+        description: Total rating value for that user, given and received.
+      rating_given:
+        type: number
+        description: Total given rating value for that user.
+      rating_given_count:
+        type: number
+        description: Amount of ratings given by that user.
+      rating_received:
+        type: number
+        description: Total received rating value for that user.
+      rating_received_count:
+        type: number
+        description: Amount of ratings received by that user.
+      ratings:
+        type: array
+        items:
+          $ref: "#/definitions/Rating"
         
 
     
