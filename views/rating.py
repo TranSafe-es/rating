@@ -25,9 +25,9 @@ log = logging.getLogger()
 
 @rating.route("/", methods=['POST'])
 def create():
-    if request.form["dest_id"] is None or request.form["source_id"] is None or request.form["rating"] is None:
+    if request.form["dest_id"] is None or request.form["source_id"] is None or request.form["rating"] is None or request.form["transaction_id"]:
         return build_error_response("Invalid Parameters", 400,
-                                    "Destination ID, Source ID or Rating not present in the request")
+                                    "Destination ID, Source ID, Rating or Transaction ID not present in the request")
 
     if int(request.form["rating"]) < 1 or int(request.form["rating"]) > 5:
         return build_error_response("Invalid Rating Values", 400,
@@ -36,6 +36,7 @@ def create():
     dest_id = request.form["dest_id"]
     source_id = request.form["source_id"]
     rate_value = int(request.form["rating"])
+    transaction_id = request.form["transaction_id"]
     rate_id = uuid.uuid4()
 
     if UsersRating.query.filter_by(uid=dest_id).count() < 1:
@@ -80,10 +81,10 @@ def create():
 
     if request.form["message"] is not None:
         message = request.form["message"]
-        rate = Ratings(uid=rate_id, user_id_source=source_id, user_id_destination=dest_id, rating=rate_value,
+        rate = Ratings(uid=rate_id, user_id_source=source_id, user_id_destination=dest_id, rating=rate_value, transaction_id=transaction_id
                        message=message)
     else:
-        rate = Ratings(uid=rate_id, user_id_source=source_id, user_id_destination=dest_id, rating=rate_value)
+        rate = Ratings(uid=rate_id, user_id_source=source_id, user_id_destination=dest_id, rating=rate_value, transaction_id=transaction_id)
 
     db_session.add(rate)
     db_session.commit()
@@ -93,7 +94,7 @@ def create():
 
 @rating.route("/<uid>/", methods=['GET'])
 def get_rating(uid):
-    fields_available = ["uid", "user_id_source", "user_id_destination", "rating", "message", "creation_date"]
+    fields_available = ["uid", "user_id_source", "user_id_destination", "rating", "message", "creation_date", "transaction_id"]
     rating_type = "received"
     size = 5
     fields = ["rating"]

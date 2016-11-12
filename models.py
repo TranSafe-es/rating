@@ -100,13 +100,15 @@ class Ratings(Base):
     rating = Column(Integer)
     message = Column(String)
     creation_date = Column(DateTime, default=datetime.datetime.now())
+    transaction_id = Column(String)
 
-    def __init__(self, uid, user_id_source, user_id_destination, rating, message="Without Message"):
+    def __init__(self, uid, user_id_source, user_id_destination, rating, transaction_id, message="Without Message"):
         self.uid = uid
         self.user_id_source = user_id_source
         self.user_id_destination = user_id_destination
         self.rating = rating
         self.message = message
+        self.transaction_id = transaction_id
 
     def serialize(self, fields=['rating']):
         """Return object data in easily serializeable format"""
@@ -116,6 +118,7 @@ class Ratings(Base):
             'user_id_destination': self.user_id_destination,
             'rating': self.rating,
             'message': self.message,
-            'creation_date': self.creation_date.strftime('%d-%m-%Y %H:%M')
+            'creation_date': self.creation_date.strftime('%d-%m-%Y %H:%M'),
+            'transaction_id': self.transaction_id
         }
         return {key: value for (key, value) in data.iteritems() if key in fields}
