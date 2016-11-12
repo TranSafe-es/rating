@@ -100,7 +100,7 @@ class Ratings(Base):
     rating = Column(Integer)
     message = Column(String)
     creation_date = Column(DateTime, default=datetime.datetime.now())
-    transaction_id = Column(String)
+    transaction_id = Column(String, unique=True)
 
     def __init__(self, uid, user_id_source, user_id_destination, rating, transaction_id, message="Without Message"):
         self.uid = uid

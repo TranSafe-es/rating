@@ -133,6 +133,24 @@ def get_rating(uid):
         data = UsersRating.query.filter_by(uid=uid).first().serialize(fields=fields, size=size, rating_type=rating_type)
     return build_response(data, 200, "Rating successfully retrieved.")
 
+@rating.route("/transaction/<transaction_id>/", methods=['GET'])
+def get_rating_for_transaction(transaction_id):
+    fields_available = ["uid", "user_id_source", "user_id_destination", "rating", "message", "creation_date", "transaction_id"]
+    fields = ["rating"]
+
+    if "fields" in request.args:
+        fields_requested = request.args.get("fields").split(",")
+        if False if [x in fields_available for x in fields_requested] else True:
+            return build_error_response("Invalid fields parameter", 400,
+                                        "Fields argument contains an invalid field")
+        fields = fields_requested
+
+    try:
+        data = Ratings.query.filter_by(transaction_id=transaction_id).first().serialize(fields=fields)
+        return build_response(data, 200, "Rating successfully retrieved.")
+    except:
+        return build_error_response("Not Found", 404, "There is no rating for that transaction")
+
 
 def build_response(data, status, desc):
     jd = {"status_code:": status, "error": "", "description": desc, "data": data}

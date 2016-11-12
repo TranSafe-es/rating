@@ -41,6 +41,12 @@ class TestCase(unittest.TestCase):
         response = self.app.get("/api/v1/rating/ola/?fields=rating,message,creation_date&size=10&rating=all")
 
         print response.data
+        self.assertEqual(response.status_code, 200)
+
+        response = self.app.get("/api/v1/rating/transaction/aaa/?fields=rating,message,creation_date")
+
+        print response.data
+        self.assertEqual(response.status_code, 200)
         '''
         resp_json = json.loads(response.data)
 
