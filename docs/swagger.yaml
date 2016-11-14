@@ -75,7 +75,7 @@ paths:
           type: string
           in: query
         - name: fields
-          description: The fields the user wants to retrieve. Options are rating, source_id, dest_id, message. Default only rating is given
+          description: The fields the user wants to retrieve. Options are rating, user_id_source, user_id_destination, message. Default only rating is given
           required: false
           type: string
           in: query
@@ -112,7 +112,7 @@ paths:
           type: string
           in: query
         - name: fields
-          description: The fields the user wants to retrieve. Options are rating, source_id, dest_id, message. Default only rating is given
+          description: The fields the user wants to retrieve. Options are rating, user_id_source, user_id_destination, message. Default only rating is given
           required: false
           type: string
           in: query
