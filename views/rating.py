@@ -25,7 +25,6 @@ log = logging.getLogger()
 
 @rating.route("/", methods=['POST'])
 def create():
-    print "hello"
     if request.form["dest_id"] is None or request.form["source_id"] is None or request.form["rating"] is None or request.form["transaction_id"] is None:
         return build_error_response("Invalid Parameters", 400,
                                     "Destination ID, Source ID, Rating or Transaction ID not present in the request")
@@ -57,8 +56,7 @@ def create():
             db_session.rollback()
 
     if Ratings.query.filter_by(transaction_id=transaction_id).first() is not None:
-        print "entrei"
-        return build_error_response("Invalid transaction ID", 402,
+        return build_error_response("Invalid transaction ID", 400,
                                     "Transaction ID is already in use.")
 
     if request.form["message"] is not None:
