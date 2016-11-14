@@ -109,8 +109,7 @@ def create():
         user.rating_given_count += 1
         db_session.commit()
 
-
-
+    print "teste"
     return build_response("Rate Done", 200, "Rate has been done successfully")
 
 
