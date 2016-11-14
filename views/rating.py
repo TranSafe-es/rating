@@ -135,6 +135,7 @@ def get_rating(uid):
             size = request.args.get("size")
 
     if "fields" in request.args:
+        print request.args.get("fields")
         fields_requested = request.args.get("fields").split(",")
         if False if [x in fields_available for x in fields_requested] else True:
             return build_error_response("Invalid fields parameter", 400,
