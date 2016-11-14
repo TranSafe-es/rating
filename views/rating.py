@@ -55,7 +55,7 @@ def create():
         except:
             db_session.rollback()
 
-    if Ratings.query.filter_by(transaction_id=transaction_id).count() > 0:
+    if Ratings.query.filter_by(transaction_id=transaction_id).first() is not None:
         return build_error_response("Invalid transaction ID", 400,
                                     "Transaction ID is already in use.")
 
