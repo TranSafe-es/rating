@@ -39,6 +39,33 @@ def create():
     transaction_id = request.form["transaction_id"]
     rate_id = uuid.uuid4()
 
+    if UsersRating.query.filter_by(uid=source_id).first() is None:
+        user_dest = UsersRating(uid=source_id)
+        db_session.add(user_dest)
+        try:
+            db_session.commit()
+        except:
+            db_session.rollback()
+
+    if UsersRating.query.filter_by(uid=dest_id).first() is None:
+        user_dest = UsersRating(uid=dest_id)
+        db_session.add(user_dest)
+        try:
+            db_session.commit()
+        except:
+            db_session.rollback()
+
+    if request.form["message"] is not None:
+        message = request.form["message"]
+        rate = Ratings(uid=rate_id, user_id_source=source_id, user_id_destination=dest_id, rating=rate_value, transaction_id=transaction_id,
+                       message=message)
+
+    else:
+        rate = Ratings(uid=rate_id, user_id_source=source_id, user_id_destination=dest_id, rating=rate_value, transaction_id=transaction_id)
+
+    db_session.add(rate)
+    db_session.commit()
+
     if UsersRating.query.filter_by(uid=dest_id).count() < 1:
         rating_received = (rate_value*100)/5
         rating_received_count = 1
@@ -79,15 +106,7 @@ def create():
         user.rating_given_count += 1
         db_session.commit()
 
-    if request.form["message"] is not None:
-        message = request.form["message"]
-        rate = Ratings(uid=rate_id, user_id_source=source_id, user_id_destination=dest_id, rating=rate_value, transaction_id=transaction_id,
-                       message=message)
-    else:
-        rate = Ratings(uid=rate_id, user_id_source=source_id, user_id_destination=dest_id, rating=rate_value, transaction_id=transaction_id)
 
-    db_session.add(rate)
-    db_session.commit()
 
     return build_response("Rate Done", 200, "Rate has been done successfully")
 
