@@ -118,6 +118,7 @@ def get_rating(uid):
     rating_type = "received"
     size = 5
     fields = ["rating"]
+    print request.args
     if "rating" in request.args:
         if request.args.get("rating") not in ["received", "given", "all"]:
             return build_error_response("Invalid rating parameter", 400,
