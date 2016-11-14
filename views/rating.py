@@ -56,6 +56,7 @@ def create():
             db_session.rollback()
 
     if Ratings.query.filter_by(transaction_id=transaction_id).first() is not None:
+        print "entrei"
         return build_error_response("Invalid transaction ID", 400,
                                     "Transaction ID is already in use.")
 
