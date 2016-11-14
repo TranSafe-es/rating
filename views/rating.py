@@ -55,11 +55,14 @@ def create():
         except:
             db_session.rollback()
 
+    if Ratings.query.filter_by(transaction_id=transaction_id).count() > 0:
+        return build_error_response("Invalid transaction ID", 400,
+                                    "Transaction ID is already in use.")
+
     if request.form["message"] is not None:
         message = request.form["message"]
         rate = Ratings(uid=rate_id, user_id_source=source_id, user_id_destination=dest_id, rating=rate_value, transaction_id=transaction_id,
                        message=message)
-
     else:
         rate = Ratings(uid=rate_id, user_id_source=source_id, user_id_destination=dest_id, rating=rate_value, transaction_id=transaction_id)
 
